@@ -39,10 +39,11 @@ export default function Register() {
       setIsLoading(false)
       return
     }
-
+    
     try {
+      // This is where the backend authentication needs to happen if connected with Team B
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        router.push("./dashboard")
+        router.push("./login")
       } catch (error) {
       
     } finally {
@@ -71,7 +72,7 @@ export default function Register() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required />
+              <Input id="email" name="email" type="email" placeholder="student@university.edu" value={formData.email} onChange={handleChange} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="major">Major</Label>
