@@ -79,7 +79,6 @@ export default function DegreePlanPage() {
     (completedCredits / totalCredits) * 100
   );
 
-  // Helper function to check if a course is completed
   const isCourseCompleted = (courseCode) => {
     return completedCourses.some((course) => course.code === courseCode);
   };
