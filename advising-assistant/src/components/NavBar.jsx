@@ -1,9 +1,26 @@
-"use client"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { GraduationCap } from "lucide-react"
+"use client";
+
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { GraduationCap } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const authPages = ["/", "/login", "/register", "/about"];
+
+  const isAuthPage = authPages.includes(pathname);
+
   return (
     <nav className="bg-white shadow-sm">
       <div className="container mx-auto px-4">
@@ -12,29 +29,48 @@ export default function Navbar() {
             <GraduationCap />
             Advising Assistant
           </Link>
-          {/* Navigation */}
+
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
-              Dashboard
-            </Link>
-            <Link href="/courses" className="text-gray-600 hover:text-gray-900">
-              Courses
-            </Link>
-            <Link href="/plan" className="text-gray-600 hover:text-gray-900">
-              Plan
-            </Link>
-            <div className="flex gap-4">
-            <Link href="/login">
-              <Button size="sm"
-              >Login</Button>
-            </Link>
-            <Link href="/register">
-              <Button size="sm">Register</Button>
-            </Link>
-            </div>
+            {isAuthPage ? (
+              <div className="flex gap-4">
+                <Link href="/login">
+                  <Button size="sm">Login</Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="sm">Register</Button>
+                </Link>
+                <Link href="/about">
+                  <Button size="sm">About</Button>
+                </Link>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/courses"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  Courses
+                </Link>
+                <Link
+                  href="/plan"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  Plan
+                </Link>
+                <div className="flex gap-4">
+                    <Button size="sm" onClick={() => router.replace('/login')}>Logout</Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
     </nav>
-  )
+  );
 }
