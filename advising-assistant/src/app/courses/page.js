@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -43,7 +42,6 @@ const formSchema = z.object({
 });
 
 export default function CoursesPage() {
-  const router = useRouter();
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -59,19 +57,13 @@ export default function CoursesPage() {
     },
   });
 
-  // Check authentication and fetch student data (F1: Courses Taken, F2: Recommended Courses)
+  // Fetch student data (F1: Courses Taken, F2: Recommended Courses)
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       setError('');
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          router.push('/login');
-          return;
-        }
-
-        const data = await fetchStudentData('student123'); // Replace with actual student ID
+        const data = await fetchStudentData('student123'); // Using placeholder student ID
         setStudentData(data);
       } catch (err) {
         setError('Failed to load courses. Please try again.');
@@ -81,19 +73,13 @@ export default function CoursesPage() {
       }
     };
     loadData();
-  }, [router]);
+  }, []);
 
   // Handle form submission (C1: Course Form, C10: Course Planner)
   const onSubmit = async (values) => {
     setError('');
     setSavedSuccess(false);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-
       // Submit course to backend (C8)
       await fetchStudentData('student123', {
         method: 'POST',
