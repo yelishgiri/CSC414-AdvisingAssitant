@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -15,59 +15,39 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle2 } from 'lucide-react';
-import Link from 'next/link';
-import { fetchStudentData } from '@/lib/api';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-
-// Form schema for validation (C7: Data Validation)
-const formSchema = z.object({
-  courseCode: z.string().min(1, 'Course code is required'),
-  courseName: z.string().min(1, 'Course name is required'),
-  interests: z.string().optional(),
-});
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { fetchStudentData } from "@/lib/api";
 
 export default function CoursesPage() {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [savedSuccess, setSavedSuccess] = useState(false);
-
-  // Form setup with react-hook-form and zod
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      courseCode: '',
-      courseName: '',
-      interests: '',
-    },
+  const [courseForm, setCourseForm] = useState({
+    courseCode: "",
+    courseName: "",
+    interests: "",
   });
 
-  // Fetch student data (F1: Courses Taken, F2: Recommended Courses)
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setCourseForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      setError('');
+      setError("");
       try {
-        const data = await fetchStudentData('student123'); // Using placeholder student ID
+        const data = await fetchStudentData("student123");
         setStudentData(data);
-      } catch (err) {
-        setError('Failed to load courses. Please try again.');
-        console.error('Error fetching student data:', err);
+      } catch {
+        setError("Failed to load courses. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -75,30 +55,44 @@ export default function CoursesPage() {
     loadData();
   }, []);
 
-  // Handle form submission (C1: Course Form, C10: Course Planner)
-  const onSubmit = async (values) => {
-    setError('');
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
     setSavedSuccess(false);
-    try {
-      // Submit course to backend (C8)
-      await fetchStudentData('student123', {
-        method: 'POST',
-        endpoint: '/add-course', // Adjust based on actual API
-        data: values,
-      });
 
-      // Refresh student data
-      const data = await fetchStudentData('student123');
-      setStudentData(data);
+    if (!courseForm.courseCode.trim() || !courseForm.courseName.trim()) {
+      setError("Course Code and Course Name are required.");
+      return;
+    }
+
+    try {
+      const newCourse = {
+        id: Date.now().toString(),
+        code: courseForm.courseCode,
+        name: courseForm.courseName,
+        credits: 3,
+        semester: "Planned",
+        grade: "N/A",
+      };
+
+      setStudentData((prev) => ({
+        ...prev,
+        completedCourses: [...prev.completedCourses, newCourse],
+      }));
+
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3000);
-      form.reset();
-    } catch (err) {
-      setError(err.message || 'Failed to add course');
+
+      setCourseForm({
+        courseCode: "",
+        courseName: "",
+        interests: "",
+      });
+    } catch {
+      setError("Failed to add course.");
     }
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -107,7 +101,6 @@ export default function CoursesPage() {
     );
   }
 
-  // Error or no data state
   if (!studentData) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -137,7 +130,6 @@ export default function CoursesPage() {
         </Button>
       </div>
 
-      {/* Error and Success Alerts */}
       {error && (
         <Alert className="mb-6 bg-red-50 border-red-200">
           <AlertTitle className="text-red-800">Error</AlertTitle>
@@ -154,7 +146,6 @@ export default function CoursesPage() {
         </Alert>
       )}
 
-      {/* Courses Taken Section (F1) */}
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Courses Taken</CardTitle>
@@ -188,7 +179,6 @@ export default function CoursesPage() {
         </CardContent>
       </Card>
 
-      {/* Recommended Courses Section (F2, C5) */}
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Recommended Courses</CardTitle>
@@ -227,74 +217,65 @@ export default function CoursesPage() {
         </CardContent>
       </Card>
 
-      {/* Add Course Form (C1, C10) */}
       <Card>
         <CardHeader>
           <CardTitle>Add a Course</CardTitle>
           <CardDescription>Add a course to your academic plan</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
+          <form onSubmit={handleFormSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label
+                  htmlFor="courseCode"
+                  className="block text-sm font-medium"
+                >
+                  Course Code
+                </label>
+                <Input
+                  id="courseCode"
                   name="courseCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Course Code</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., CSC101" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="courseName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Course Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., Introduction to Programming"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  value={courseForm.courseCode}
+                  onChange={handleFormChange}
+                  placeholder="e.g., CSC101"
+                  required
                 />
               </div>
-              <FormField
-                control={form.control}
+              <div className="space-y-2">
+                <label
+                  htmlFor="courseName"
+                  className="block text-sm font-medium"
+                >
+                  Course Name
+                </label>
+                <Input
+                  id="courseName"
+                  name="courseName"
+                  value={courseForm.courseName}
+                  onChange={handleFormChange}
+                  placeholder="e.g., Introduction to Programming"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="interests" className="block text-sm font-medium">
+                Academic Interests (Optional)
+              </label>
+              <Input
+                id="interests"
                 name="interests"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Academic Interests (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., AI, Big Data" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={courseForm.interests}
+                onChange={handleFormChange}
+                placeholder="e.g., AI, Big Data"
               />
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <span className="flex items-center">
-                    <span className="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full"></span>
-                    Adding...
-                  </span>
-                ) : (
-                  'Add Course'
-                )}
-              </Button>
-            </form>
-          </Form>
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Adding..." : "Add Course"}
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>
   );
 }
-
