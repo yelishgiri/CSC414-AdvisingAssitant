@@ -39,6 +39,25 @@ npm run dev
 Open your browser and go to `http://localhost:3000` to view the app.
 
 
+---
+
+## UI Flow: How to Use the App
+
+1. **Landing Page** → Navigate to _Get Started_ or _About the Project_
+2. **Register** as a new student → redirected to the login page
+3. **Login** → Access the main dashboard
+4. Dashboard shows:
+   - Current progress
+   - Timeline for registration
+   - Graduation projection
+5. Navigate to:
+   - 📌 **Courses** (view completed, remaining, plan next semester)
+   - ✅ **Plan Next Semester**
+   - ⭐ **Edit Interests** page
+
+
+---
+
 
 ## 📌 Features
 
@@ -50,11 +69,23 @@ Open your browser and go to `http://localhost:3000` to view the app.
 
 ---
 
+
+
 ## 👨‍💻 Team Members – Group 3
 
 | Name                  | Role                    |
 |-----------------------|-------------------------|
-| Oluwajomiloju Adejumo | Front-End Development   |
-| Keishon Boose         | Front-End Development   |
-| Rabindra Giri         | Front-End Development   |
-| Evans Smith           | Front-End Development   |
+| Oluwajomiloju Adejumo | UI/ UX Design           |
+| Keishon Boose         | Project Manager         |
+| Rabindra Giri         | Development             |
+| Evans Smith           | Development             |
+
+
+---
+
+```bash
+/components → Reusable UI Components /lib/api.js → Mock API handlers /pages → Application routes
+/pages/dashboard → Dashboard screen /pages/courses → Course viewer /pages/plan → Semester planner
+/pages/interests → Interest update UI
+```
+
